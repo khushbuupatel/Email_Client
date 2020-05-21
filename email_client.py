@@ -176,9 +176,9 @@ if __name__ == "__main__":
     recipient = mail_id
 
     # add Cpu and Memory usage info to respective files
-    os.system('cat /proc/cpuinfo >> cpu_info.txt')
-    os.system('cat /proc/meminfo >> mem_info.txt')
-    os.system('ps -aux >> running_process.txt')
+    os.system('cat /proc/cpuinfo > cpu_info.txt')
+    os.system('cat /proc/meminfo > mem_info.txt')
+    os.system('ps -aux > running_process.txt')
 
     body = '*************** CPU INFO ***************\n'
     # add cpu info to body
@@ -201,5 +201,5 @@ if __name__ == "__main__":
 
     # send email to recipient
     if email_client.send(recipient):
-        print('Email was sent successfully to ', recipient)
+        print('Email was sent successfully to ', recipient, formatdate(localtime=True))
 
