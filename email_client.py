@@ -10,21 +10,22 @@ from pathlib import Path
 
 class EmailClient:
 
-    def __init__(self, server: str, server_port: int, mail_id: str, password: str):
+    def __init__(self, server_dns: str, server_port: int, email_id: str, mail_password: str):
         """
         This method initializes the smtp server for sending email
 
-        :param server: smpt server for Gmail, yahoo, etc that is to be used
+        :param server_dns: smpt server for Gmail, yahoo, etc that is to be used
         :param server_port: port of the mail server used above
-        :param mail_id: mail id of the sender
-        :param password: password of the sender
+        :param email_id: mail id of the sender
+        :param mail_password: password of the sender
         """
         # initialize the server details
-        self.mail_id = mail_id
-        self.password = password
-        self.server = server
+        self.mail_id = email_id
+        self.password = mail_password
+        self.server = server_dns
         self.server_port = server_port
         self.mail_content = MIMEMultipart()
+        self.mail_server = smtplib.SMTP()
 
         # variables to verify if the mail contents are added properly
         self.subject_added = False
@@ -32,25 +33,25 @@ class EmailClient:
         self.attachment_added = False
         self.signature_added = False
 
-    def set_subject(self, subject: str):
+    def set_subject(self, mail_subject: str):
         """
         This method sets the subject of the mail content
 
-        :param subject: subject to be added
+        :param mail_subject: subject to be added
         """
-        if subject != '':
+        if mail_subject != '':
             self.subject_added = True
-            self.mail_content['Subject'] = subject
+            self.mail_content['Subject'] = mail_subject
 
-    def set_body(self, body: str):
+    def set_body(self, mail_body: str):
         """
         This method add the body to the mail content
 
-        :param body: text of the body to be added
+        :param mail_body: text of the body to be added
         """
-        if body != '':
+        if mail_body != '':
             self.body_added = True
-            self.mail_content.attach(MIMEText(body, 'plain'))
+            self.mail_content.attach(MIMEText(mail_body, 'plain'))
 
     def set_signature(self, signature: str):
         """
@@ -63,33 +64,33 @@ class EmailClient:
             self.signature_added = True
             self.mail_content.attach(MIMEText(signature, 'plain'))
 
-    def add_attachment(self, attachment_path: str):
+    def add_attachment(self, mail_attachment_path: str):
         """
         This method add attachment to the email content
 
-        :param attachment_path: path of the file to be attached
+        :param mail_attachment_path: path of the file to be attached
         """
         # check if attachment path is a file
-        if os.path.isfile(attachment_path):
+        if os.path.isfile(mail_attachment_path):
             attachment = MIMEBase('application', "octet-stream")
 
             # read the attachment file as binary
-            with open(attachment_path, 'rb') as file:
-                attachment.set_payload(file.read())
+            with open(mail_attachment_path, 'rb') as f_obj:
+                attachment.set_payload(f_obj.read())
             encoders.encode_base64(attachment)
 
             attachment.add_header('Content-Disposition',
-                                  'attachment; filename="{}"'.format(Path(attachment_path).name))
+                                  'attachment; filename="{}"'.format(Path(mail_attachment_path).name))
 
             # attach the attachment with the mail content
             self.mail_content.attach(attachment)
             self.attachment_added = True
 
-    def send(self, recipient: str) -> bool:
+    def send(self, mail_recipient: str) -> bool:
         """
         This method sends the email and returns True if sent successfully and false otherwise.
 
-        :param recipient: Email of the recipient
+        :param mail_recipient: Email of the recipient
         :return: True if sent successfully, false other
         """
 
@@ -112,7 +113,7 @@ class EmailClient:
         mailSent = False
 
         # set the to and from part of the mail with today's date
-        self.mail_content['To'] = recipient
+        self.mail_content['To'] = mail_recipient
         self.mail_content['From'] = self.mail_id
         self.mail_content['Date'] = formatdate(localtime=True)
 
@@ -159,8 +160,6 @@ class EmailClient:
 if __name__ == "__main__":
 
     # credentials of the sender
-    mail_id, password = '', ''
-
     with open('Credentials.txt', 'r') as f:
         mail_id, password = f.read().split(",")
 
@@ -201,5 +200,4 @@ if __name__ == "__main__":
 
     # send email to recipient
     if email_client.send(recipient):
-        print('Email was sent successfully to ', recipient, formatdate(localtime=True))
-
+        print('Email was sent successfully to ', recipient)
