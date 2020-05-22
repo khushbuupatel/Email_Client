@@ -6,11 +6,9 @@ class EmailClientTestCases(unittest.TestCase):
 
     # server details
     server = 'smtp.zoho.com.au'
-    server_port = '587'
+    server_port = 587
 
     # sender's credentials
-    mail_id, password = '', ''
-
     with open('Credentials.txt', 'r') as f:
         mail_id, password = f.read().split(",")
 
