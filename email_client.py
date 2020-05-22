@@ -109,8 +109,8 @@ class EmailClient:
             print('Cannot send empty emails!')
             return False
 
-        # set mailSent variable to false initially
-        mailSent = False
+        # set mail_sent variable to false initially
+        mail_sent = False
 
         # set the to and from part of the mail with today's date
         self.mail_content['To'] = mail_recipient
@@ -129,7 +129,7 @@ class EmailClient:
 
             # send email
             self.mail_server.send_message(self.mail_content)
-            mailSent = True
+            mail_sent = True
 
         except OSError as e:
             print(
@@ -140,7 +140,7 @@ class EmailClient:
             self.mail_server.quit()
             del self.mail_content
 
-        return mailSent
+        return mail_sent
 
     def reset_email(self):
         """
